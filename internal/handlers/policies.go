@@ -7,6 +7,7 @@ import (
 	"github.com/labstack/echo/v4"
 
 	dbpkg "goapp/internal/db"
+	"goapp/internal/i18n"
 )
 
 type PoliciesHandler struct {
@@ -30,8 +31,11 @@ func (h *PoliciesHandler) ShowPolicies(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, "could not load policies")
 	}
 
+	lang := i18n.Resolve(c)
 	return c.Render(http.StatusOK, "policies.html", map[string]any{
 		"User":     user,
 		"Policies": policies,
+		"Lang":     lang,
+		"Dir":      i18n.Dir(lang),
 	})
 }

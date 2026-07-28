@@ -123,6 +123,22 @@ func (ts *testState) visitLogin() error {
 	return ts.captureResponse(resp)
 }
 
+func (ts *testState) visitLoginInLang(lang string) error {
+	resp, err := ts.client.Get(ts.server.URL + "/login?lang=" + lang)
+	if err != nil {
+		return err
+	}
+	return ts.captureResponse(resp)
+}
+
+func (ts *testState) dirIs(dir string) error {
+	needle := `dir="` + dir + `"`
+	if !strings.Contains(ts.lastBody, needle) {
+		return fmt.Errorf("expected page to contain %q, got:\n%s", needle, ts.lastBody)
+	}
+	return nil
+}
+
 func (ts *testState) captureResponse(resp *http.Response) error {
 	defer resp.Body.Close()
 	buf := make([]byte, 0, 8192)
@@ -212,6 +228,15 @@ func InitializeScenario(sc *godog.ScenarioContext) {
 
 	sc.Step(`^דף ה-HTML כולל הפניה לספריית Bootstrap$`,
 		func() error { return ts.bodyContains("bootstrap") })
+
+	sc.Step(`^המשתמש פותח את מסך ההתחברות בשפה "([^"]+)"$`,
+		func(lang string) error { return ts.visitLoginInLang(lang) })
+
+	sc.Step(`^כותרת מסך ההתחברות מוצגת בעברית$`, func() error { return ts.bodyContains("ברוכים הבאים") })
+	sc.Step(`^כותרת מסך ההתחברות מוצגת באנגלית$`, func() error { return ts.bodyContains("Welcome") })
+
+	sc.Step(`^כיוון הדף הוא מימין לשמאל$`, func() error { return ts.dirIs("rtl") })
+	sc.Step(`^כיוון הדף הוא משמאל לימין$`, func() error { return ts.dirIs("ltr") })
 
 	sc.Step(`^הוא מופנה למסך ההתחברות$`,
 		func() error { return ts.redirectedTo("/login") })

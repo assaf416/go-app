@@ -1,27 +1,36 @@
 {{define "login.html"}}
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="{{.Lang}}" dir="{{.Dir}}">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>התחברות - ביטוחים שלי</title>
+	<title>{{t .Lang "welcome_title"}}</title>
 	<script src="https://unpkg.com/htmx.org@1.9.12"></script>
 	<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js" defer></script>
+	{{if eq .Dir "rtl"}}
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css">
+	{{else}}
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+	{{end}}
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
-<body class="bg-light d-flex align-items-center justify-content-center min-vh-100" dir="rtl">
+<body class="bg-light d-flex align-items-center justify-content-center min-vh-100" dir="{{.Dir}}">
 	<div class="card shadow-sm p-4 w-100" style="max-width: 420px;" x-data="{ password: '' }">
 		<div class="card-body">
-			<h1 class="h3 fw-bold mb-1">ברוכים הבאים</h1>
-			<p class="text-secondary mb-4">התחברו כדי לצפות בפוליסות הביטוח שלכם</p>
+			<div class="d-flex justify-content-end gap-2 small mb-2">
+				<a href="?lang=he" class="link-secondary text-decoration-none">עברית</a>
+				<span class="text-muted">|</span>
+				<a href="?lang=en" class="link-secondary text-decoration-none">English</a>
+			</div>
+			<h1 class="h3 fw-bold mb-1">{{t .Lang "welcome_title"}}</h1>
+			<p class="text-secondary mb-4">{{t .Lang "welcome_subtitle"}}</p>
 
 			<div id="login-form-container">
 				{{template "login_form_fields" .}}
 			</div>
 
 			<p class="text-muted small mt-4 mb-0">
-				לדוגמה: dana@example.com / password123
+				{{t .Lang "demo_hint"}}
 			</p>
 		</div>
 	</div>
@@ -32,20 +41,20 @@
 {{define "login_form.html"}}{{template "login_form_fields" .}}{{end}}
 
 {{define "login_form_fields"}}
-<form hx-post="/login" hx-target="#login-form-container" hx-swap="innerHTML">
+<form hx-post="/login?lang={{.Lang}}" hx-target="#login-form-container" hx-swap="innerHTML">
 	{{if .Error}}
 	<div class="alert alert-danger py-2" role="alert">{{.Error}}</div>
 	{{end}}
 	<div class="mb-3">
-		<label class="form-label">אימייל</label>
+		<label class="form-label">{{t .Lang "email_label"}}</label>
 		<input type="email" name="email" required autofocus class="form-control" />
 	</div>
 	<div class="mb-3">
-		<label class="form-label">סיסמה</label>
+		<label class="form-label">{{t .Lang "password_label"}}</label>
 		<input type="password" name="password" required class="form-control" />
 	</div>
 	<button type="submit" class="btn btn-primary w-100">
-		התחברות
+		{{t .Lang "login_button"}}
 	</button>
 </form>
 {{end}}
