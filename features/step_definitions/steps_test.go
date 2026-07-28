@@ -51,7 +51,7 @@ func newTestState() *testState {
 	f.Close()
 
 	conn := dbpkg.Open(f.Name())
-	e := app.New(conn, "test-secret", "../../web/templates/*.html")
+	e := app.New(conn, "test-secret", "../../web/templates/*.html", fakeGithubFetcher)
 	server := httptest.NewServer(e)
 
 	jar, _ := cookiejar.New(nil)
@@ -288,6 +288,21 @@ func InitializeScenario(sc *godog.ScenarioContext) {
 	sc.Step(`^האפליקציה פועלת כרגיל ללא שגיאות$`, func() error { return ts.appRunsWithoutErrors() })
 	sc.Step(`^דיווח השגיאות ל-Sentry אינו מאותחל$`, func() error { return ts.sentryNotInitialized() })
 	sc.Step(`^מנגנון הדיווח ל-Sentry מאותחל$`, func() error { return ts.sentryInitialized() })
+
+	sc.Step(`^המשתמש מוסיף פרויקט בשם "([^"]+)" עם כתובת גיטהאב "([^"]+)"$`,
+		func(name, githubURL string) error { return ts.addProject(name, githubURL) })
+
+	sc.Step(`^הפרויקט "([^"]+)" מופיע ברשימת הפרויקטים$`,
+		func(name string) error { return ts.projectAppearsInList(name) })
+
+	sc.Step(`^שקיים פרויקט בשם "([^"]+)" עם כתובת גיטהאב "([^"]+)"$`,
+		func(name, githubURL string) error { return ts.projectExists(name, githubURL) })
+
+	sc.Step(`^המשתמש פותח את מסך הפרויקט "([^"]+)"$`,
+		func(name string) error { return ts.openProjectScreen(name) })
+
+	sc.Step(`^מוצגים ה-issues, ה-PRs וה-commits של המאגר$`,
+		func() error { return ts.githubActivityDisplayed() })
 }
 
 func TestMain(m *testing.M) {

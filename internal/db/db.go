@@ -26,6 +26,12 @@ CREATE TABLE IF NOT EXISTS policies (
 	coverage TEXT NOT NULL,
 	kp_card TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS projects (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	project_name TEXT NOT NULL,
+	github_url TEXT NOT NULL DEFAULT ''
+);
 `
 
 // Open opens (and if needed creates + seeds) the sqlite database at path.

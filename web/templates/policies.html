@@ -22,6 +22,10 @@
 				<p class="small text-secondary mb-0">{{.User.Email}} · {{.User.Phone}}</p>
 			</div>
 			<div class="d-flex align-items-center gap-3">
+				<nav class="d-flex gap-3 small">
+					<a href="/policies" class="fw-semibold text-decoration-none">{{t .Lang "nav_policies"}}</a>
+					<a href="/projects" class="link-secondary text-decoration-none">{{t .Lang "nav_projects"}}</a>
+				</nav>
 				<div class="d-flex gap-2 small">
 					<a href="?lang=he" class="link-secondary text-decoration-none">עברית</a>
 					<span class="text-muted">|</span>
