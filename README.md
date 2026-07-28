@@ -94,9 +94,3 @@ Everything (unit + feature tests):
 ```bash
 go test ./...
 ```
-
-## CI
-
-[.github/workflows/ci.yml](.github/workflows/ci.yml) runs `go build`, `go vet`,
-and the full test suite (including the Hebrew Cucumber scenarios) on every push
-and pull request to `main`.
