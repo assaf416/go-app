@@ -4,6 +4,7 @@ go 1.26.5
 
 require (
 	github.com/cucumber/godog v0.15.1
+	github.com/getsentry/sentry-go v0.48.0
 	github.com/gorilla/sessions v1.4.0
 	github.com/labstack/echo/v4 v4.15.4
 	github.com/pterm/pterm v0.12.83
