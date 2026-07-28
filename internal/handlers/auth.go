@@ -9,6 +9,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 
 	dbpkg "goapp/internal/db"
+	"goapp/internal/i18n"
 )
 
 const SessionName = "goapp_session"
@@ -27,17 +28,25 @@ func (h *AuthHandler) ShowLogin(c echo.Context) error {
 	if _, ok := sess.Values["user_id"]; ok {
 		return c.Redirect(http.StatusSeeOther, "/policies")
 	}
-	return c.Render(http.StatusOK, "login.html", map[string]any{"Error": ""})
+	lang := i18n.Resolve(c)
+	return c.Render(http.StatusOK, "login.html", map[string]any{
+		"Error": "",
+		"Lang":  lang,
+		"Dir":   i18n.Dir(lang),
+	})
 }
 
 func (h *AuthHandler) Login(c echo.Context) error {
 	email := c.FormValue("email")
 	password := c.FormValue("password")
+	lang := i18n.Resolve(c)
 
 	user, err := dbpkg.FindUserByEmail(h.DB, email)
 	if err != nil || bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)) != nil {
 		return c.Render(http.StatusUnauthorized, "login_form.html", map[string]any{
-			"Error": "אימייל או סיסמה שגויים",
+			"Error": i18n.T(lang, "invalid_credentials"),
+			"Lang":  lang,
+			"Dir":   i18n.Dir(lang),
 		})
 	}
 
