@@ -48,6 +48,7 @@ features/step_definitions/      godog step definitions (Go) driving the real app
 | [`github.com/cucumber/godog`](https://github.com/cucumber/godog) | Cucumber/Gherkin (BDD) test runner for Go |
 | [`github.com/pterm/pterm`](https://github.com/pterm/pterm) | styled/colored CLI output (`--version`, `--setup`, `--send-log`) |
 | [`golang.org/x/term`](https://pkg.go.dev/golang.org/x/term) | masked password entry in `--setup` when run in a real terminal |
+| [`github.com/getsentry/sentry-go`](https://github.com/getsentry/sentry-go) | error tracking, gated by `SENTRY_DSN` |
 | [htmx](https://htmx.org/) / [Alpine.js](https://alpinejs.dev/) / [Tailwind CSS](https://tailwindcss.com/) | loaded via CDN in the templates, no frontend build step |
 
 ## Installation
@@ -80,6 +81,9 @@ Optional environment variables:
 - `PORT` — HTTP port (default `8080`)
 - `DB_PATH` — sqlite file path (default `goapp.db`)
 - `SESSION_KEY` — key used to sign session cookies (set a real secret in production)
+- `SENTRY_DSN` — if set, panics and handler errors (web server and CLI commands)
+  are reported to [Sentry](https://sentry.io). Left unset, Sentry is fully
+  disabled and has no effect on the app.
 
 ## CLI mode
 

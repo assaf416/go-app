@@ -37,6 +37,10 @@ type testState struct {
 	setupUser   string
 	smtpCapture *smtpCapture
 	smtpStop    func()
+
+	// Sentry-scenario state (see sentry_steps_test.go)
+	sentryEnabled bool
+	sentryInitErr error
 }
 
 func newTestState() *testState {
@@ -69,6 +73,7 @@ func (ts *testState) close() {
 	if ts.workDir != "" {
 		os.RemoveAll(ts.workDir)
 	}
+	os.Unsetenv("SENTRY_DSN")
 }
 
 func (ts *testState) userExists(name, email, password string) error {
@@ -276,6 +281,13 @@ func InitializeScenario(sc *godog.ScenarioContext) {
 
 	sc.Step(`^נשלח מייל עם קובץ הלוג כקובץ מצורף$`,
 		func() error { return ts.emailWithLogAttachmentSent() })
+
+	sc.Step(`^שמשתנה הסביבה SENTRY_DSN אינו מוגדר$`, func() error { return ts.sentryDSNUnset() })
+	sc.Step(`^שמשתנה הסביבה SENTRY_DSN מוגדר לערך תקין$`, func() error { return ts.sentryDSNSetToValid() })
+	sc.Step(`^האפליקציה עולה$`, func() error { return ts.appStarts() })
+	sc.Step(`^האפליקציה פועלת כרגיל ללא שגיאות$`, func() error { return ts.appRunsWithoutErrors() })
+	sc.Step(`^דיווח השגיאות ל-Sentry אינו מאותחל$`, func() error { return ts.sentryNotInitialized() })
+	sc.Step(`^מנגנון הדיווח ל-Sentry מאותחל$`, func() error { return ts.sentryInitialized() })
 }
 
 func TestMain(m *testing.M) {
