@@ -1,34 +1,45 @@
 {{define "policies.html"}}
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="{{.Lang}}" dir="{{.Dir}}">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>הפוליסות שלי</title>
+	<title>{{t .Lang "my_policies"}}</title>
 	<script src="https://unpkg.com/htmx.org@1.9.12"></script>
 	<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js" defer></script>
+	{{if eq .Dir "rtl"}}
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css">
+	{{else}}
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+	{{end}}
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
-<body class="bg-light" dir="rtl">
+<body class="bg-light" dir="{{.Dir}}">
 	<header class="bg-white border-bottom">
 		<div class="container d-flex align-items-center justify-content-between py-3">
 			<div>
-				<h1 class="h5 fw-bold mb-0">שלום, {{.User.Name}}</h1>
+				<h1 class="h5 fw-bold mb-0">{{.User.Name}}</h1>
 				<p class="small text-secondary mb-0">{{.User.Email}} · {{.User.Phone}}</p>
 			</div>
-			<form method="post" action="/logout">
-				<button type="submit" class="btn btn-outline-secondary btn-sm">
-					התנתקות
-				</button>
-			</form>
+			<div class="d-flex align-items-center gap-3">
+				<div class="d-flex gap-2 small">
+					<a href="?lang=he" class="link-secondary text-decoration-none">עברית</a>
+					<span class="text-muted">|</span>
+					<a href="?lang=en" class="link-secondary text-decoration-none">English</a>
+				</div>
+				<form method="post" action="/logout">
+					<button type="submit" class="btn btn-outline-secondary btn-sm">
+						{{t .Lang "logout_button"}}
+					</button>
+				</form>
+			</div>
 		</div>
 	</header>
 
 	<main class="container py-4" x-data="{ q: '' }">
 		<div class="d-flex align-items-center justify-content-between mb-4">
-			<h2 class="h5 fw-semibold mb-0">הפוליסות שלי ({{len .Policies}})</h2>
-			<input type="text" x-model="q" placeholder="סינון לפי חברת ביטוח..."
+			<h2 class="h5 fw-semibold mb-0">{{t .Lang "my_policies"}} ({{len .Policies}})</h2>
+			<input type="text" x-model="q" placeholder="{{t .Lang "filter_placeholder"}}"
 				class="form-control form-control-sm w-auto" style="min-width: 16rem;" />
 		</div>
 
@@ -42,14 +53,14 @@
 						<h3 class="h6 fw-bold mb-0">{{.InsuranceCompany}}</h3>
 						<span class="small text-secondary">{{.StartDate}} — {{.EndDate}}</span>
 					</div>
-					<p class="mb-1 mt-2">כיסוי: {{.Coverage}}</p>
-					<p class="small text-muted mb-0">מספר כרטיס קופ״ח: {{.KPCard}}</p>
+					<p class="mb-1 mt-2">{{t $.Lang "coverage_label"}}: {{.Coverage}}</p>
+					<p class="small text-muted mb-0">{{t $.Lang "kp_card_label"}}: {{.KPCard}}</p>
 				</div>
 			</div>
 			{{end}}
 		</div>
 		{{else}}
-		<p class="text-secondary">אין לך פוליסות פעילות כרגע.</p>
+		<p class="text-secondary">{{t .Lang "no_policies"}}</p>
 		{{end}}
 	</main>
 </body>
