@@ -26,11 +26,13 @@ func New(conn *sql.DB, sessionKey string, templatesGlob string, githubFetcher gi
 	authHandler := handlers.NewAuthHandler(conn, store)
 	policiesHandler := handlers.NewPoliciesHandler(conn)
 	projectsHandler := handlers.NewProjectsHandler(conn, githubFetcher)
+	clickLogHandler := handlers.NewClickLogHandler()
 
 	e.GET("/", func(c echo.Context) error { return c.Redirect(http.StatusSeeOther, "/login") })
 	e.GET("/login", authHandler.ShowLogin)
 	e.POST("/login", authHandler.Login)
 	e.POST("/logout", authHandler.Logout)
+	e.POST("/api/log-click", clickLogHandler.LogClick)
 
 	protected := e.Group("/policies")
 	protected.Use(authHandler.RequireAuth)

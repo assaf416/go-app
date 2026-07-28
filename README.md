@@ -22,6 +22,8 @@ Cucumber/Gherkin** features and run with `godog`.
 - Projects page: track a list of projects (name + GitHub URL); when a URL is
   set, the project's page shows its recent issues, pull requests, and commits
   straight from the GitHub API
+- Every UI click is logged (path, element, text) to `logs/development.log` or
+  `logs/production.log`, based on `APP_ENV`
 
 ## Project structure
 
@@ -88,6 +90,9 @@ Optional environment variables:
 - `SENTRY_DSN` — if set, panics and handler errors (web server and CLI commands)
   are reported to [Sentry](https://sentry.io). Left unset, Sentry is fully
   disabled and has no effect on the app.
+- `GITHUB_TOKEN` — see [Projects & GitHub integration](#projects--github-integration).
+- `APP_ENV` — `production` writes click logs to `logs/production.log`;
+  anything else (including unset) writes to `logs/development.log`.
 
 ## CLI mode
 
@@ -147,6 +152,14 @@ occasional use, or for private repos, set a token:
 If a project's GitHub URL can't be reached (bad URL, rate-limited, private
 repo without a token), the project page shows a clear error instead of
 failing the whole page.
+
+## Click logging
+
+Every page includes a small script that listens for clicks (buttons, links,
+submit inputs) and posts `{path, tag, text}` to `POST /api/log-click`, which
+appends a line to `logs/development.log` (default) or `logs/production.log`
+(when `APP_ENV=production`). The `logs/` directory is created automatically
+and is git-ignored.
 
 ## Running the tests
 

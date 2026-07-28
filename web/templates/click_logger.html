@@ -1,0 +1,18 @@
+{{define "click_logger_script"}}
+<script>
+document.addEventListener('click', function (e) {
+	var el = e.target.closest('button, a, input[type="submit"], [role="button"]') || e.target;
+	var text = (el.textContent || el.value || '').trim().slice(0, 80);
+	fetch('/api/log-click', {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		keepalive: true,
+		body: JSON.stringify({
+			path: location.pathname,
+			tag: el.tagName,
+			text: text
+		})
+	}).catch(function () {});
+});
+</script>
+{{end}}

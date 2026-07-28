@@ -41,6 +41,9 @@ type testState struct {
 	// Sentry-scenario state (see sentry_steps_test.go)
 	sentryEnabled bool
 	sentryInitErr error
+
+	// Click-logging scenario state (see click_logging_steps_test.go)
+	appEnvWasSet bool
 }
 
 func newTestState() *testState {
@@ -74,6 +77,10 @@ func (ts *testState) close() {
 		os.RemoveAll(ts.workDir)
 	}
 	os.Unsetenv("SENTRY_DSN")
+	if ts.appEnvWasSet {
+		os.Unsetenv("APP_ENV")
+		os.RemoveAll("logs")
+	}
 }
 
 func (ts *testState) userExists(name, email, password string) error {
@@ -303,6 +310,14 @@ func InitializeScenario(sc *godog.ScenarioContext) {
 
 	sc.Step(`^מוצגים ה-issues, ה-PRs וה-commits של המאגר$`,
 		func() error { return ts.githubActivityDisplayed() })
+
+	sc.Step(`^שסביבת ההרצה היא (development|production)$`,
+		func(env string) error { return ts.setAppEnv(env) })
+
+	sc.Step(`^המשתמש מבצע קליק על כפתור ההתחברות$`, func() error { return ts.userClicksLoginButton() })
+
+	sc.Step(`^הקליק נרשם בקובץ (logs/[a-z]+\.log)$`,
+		func(logFile string) error { return ts.clickLoggedInFile(logFile) })
 }
 
 func TestMain(m *testing.M) {
