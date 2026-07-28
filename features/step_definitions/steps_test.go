@@ -115,6 +115,14 @@ func (ts *testState) visitPolicies() error {
 	return ts.captureResponse(resp)
 }
 
+func (ts *testState) visitLogin() error {
+	resp, err := ts.client.Get(ts.server.URL + "/login")
+	if err != nil {
+		return err
+	}
+	return ts.captureResponse(resp)
+}
+
 func (ts *testState) captureResponse(resp *http.Response) error {
 	defer resp.Body.Close()
 	buf := make([]byte, 0, 8192)
@@ -199,6 +207,11 @@ func InitializeScenario(sc *godog.ScenarioContext) {
 
 	sc.Step(`^משתמש לא מחובר מנסה לגשת למסך הפוליסות$`,
 		func() error { return ts.visitPolicies() })
+
+	sc.Step(`^המשתמש פותח את מסך ההתחברות$`, func() error { return ts.visitLogin() })
+
+	sc.Step(`^דף ה-HTML כולל הפניה לספריית Bootstrap$`,
+		func() error { return ts.bodyContains("bootstrap") })
 
 	sc.Step(`^הוא מופנה למסך ההתחברות$`,
 		func() error { return ts.redirectedTo("/login") })
