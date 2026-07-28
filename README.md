@@ -19,6 +19,9 @@ Cucumber/Gherkin** features and run with `godog`.
   and only shows the logged-in user's own policies
 - The database is auto-created and seeded with 3 demo users and their
   policies the first time it runs against an empty file
+- Projects page: track a list of projects (name + GitHub URL); when a URL is
+  set, the project's page shows its recent issues, pull requests, and commits
+  straight from the GitHub API
 
 ## Project structure
 
@@ -49,6 +52,7 @@ features/step_definitions/      godog step definitions (Go) driving the real app
 | [`github.com/pterm/pterm`](https://github.com/pterm/pterm) | styled/colored CLI output (`--version`, `--setup`, `--send-log`) |
 | [`golang.org/x/term`](https://pkg.go.dev/golang.org/x/term) | masked password entry in `--setup` when run in a real terminal |
 | [`github.com/getsentry/sentry-go`](https://github.com/getsentry/sentry-go) | error tracking, gated by `SENTRY_DSN` |
+| [`github.com/google/go-github`](https://github.com/google/go-github) | GitHub API client for the Projects page (issues/PRs/commits) |
 | [htmx](https://htmx.org/) / [Alpine.js](https://alpinejs.dev/) / [Tailwind CSS](https://tailwindcss.com/) | loaded via CDN in the templates, no frontend build step |
 
 ## Installation
@@ -116,6 +120,33 @@ go run ./cmd/server --send-log    # emails ./app.log as an attachment, using ./s
 - Running the server normally (no flags) also appends request logs to
   `./app.log` (in addition to stdout), so there's always something for
   `--send-log` to send.
+
+## Projects & GitHub integration
+
+The **Projects** page (linked from the top nav once logged in) lets you add a
+project (name + GitHub URL) and, for any project with a URL set, shows its
+most recent issues, pull requests, and commits — read live from the GitHub
+API via [`github.com/google/go-github`](https://github.com/google/go-github).
+
+Reading a public repo works with no setup (subject to GitHub's low,
+unauthenticated rate limit — 60 requests/hour per IP). For anything beyond
+occasional use, or for private repos, set a token:
+
+1. On GitHub: **Settings → Developer settings → Personal access tokens →
+   Fine-grained tokens** → **Generate new token**.
+2. Scope it to the repo(s) you want to track, with **read-only** permissions
+   for `Contents`, `Issues`, `Pull requests`, and `Metadata` — no write access
+   is needed.
+3. Export it before starting the app:
+   ```bash
+   export GITHUB_TOKEN=github_pat_...
+   go run ./cmd/server
+   ```
+   (Classic tokens with `public_repo`/`repo` scope work too.)
+
+If a project's GitHub URL can't be reached (bad URL, rate-limited, private
+repo without a token), the project page shows a clear error instead of
+failing the whole page.
 
 ## Running the tests
 

@@ -17,3 +17,9 @@ type Policy struct {
 	Coverage          string
 	KPCard            string
 }
+
+type Project struct {
+	ID          int64
+	ProjectName string
+	GithubURL   string
+}

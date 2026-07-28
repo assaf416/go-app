@@ -82,7 +82,7 @@ func runServer(sentryEnabled bool) {
 		sessionKey = "dev-secret-change-me-in-production"
 	}
 
-	e := app.New(conn, sessionKey, "web/templates/*.html")
+	e := app.New(conn, sessionKey, "web/templates/*.html", nil)
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
 		Output: io.MultiWriter(os.Stdout, logFile),
 	}))

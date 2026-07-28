@@ -5,10 +5,12 @@ go 1.26.5
 require (
 	github.com/cucumber/godog v0.15.1
 	github.com/getsentry/sentry-go v0.48.0
+	github.com/google/go-github/v66 v66.0.0
 	github.com/gorilla/sessions v1.4.0
 	github.com/labstack/echo/v4 v4.15.4
 	github.com/pterm/pterm v0.12.83
 	golang.org/x/crypto v0.53.0
+	golang.org/x/oauth2 v0.36.0
 	golang.org/x/term v0.44.0
 	modernc.org/sqlite v1.54.0
 )
@@ -23,6 +25,7 @@ require (
 	github.com/cucumber/messages/go/v21 v21.0.1 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/gofrs/uuid v4.3.1+incompatible // indirect
+	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gookit/color v1.6.0 // indirect
 	github.com/gorilla/securecookie v1.1.2 // indirect
