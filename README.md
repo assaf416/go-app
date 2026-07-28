@@ -46,6 +46,8 @@ features/step_definitions/      godog step definitions (Go) driving the real app
 | [`github.com/gorilla/sessions`](https://github.com/gorilla/sessions) | signed session cookies |
 | [`golang.org/x/crypto/bcrypt`](https://pkg.go.dev/golang.org/x/crypto/bcrypt) | password hashing |
 | [`github.com/cucumber/godog`](https://github.com/cucumber/godog) | Cucumber/Gherkin (BDD) test runner for Go |
+| [`github.com/pterm/pterm`](https://github.com/pterm/pterm) | styled/colored CLI output (`--version`, `--setup`, `--send-log`) |
+| [`golang.org/x/term`](https://pkg.go.dev/golang.org/x/term) | masked password entry in `--setup` when run in a real terminal |
 | [htmx](https://htmx.org/) / [Alpine.js](https://alpinejs.dev/) / [Tailwind CSS](https://tailwindcss.com/) | loaded via CDN in the templates, no frontend build step |
 
 ## Installation
@@ -78,6 +80,38 @@ Optional environment variables:
 - `PORT` — HTTP port (default `8080`)
 - `DB_PATH` — sqlite file path (default `goapp.db`)
 - `SESSION_KEY` — key used to sign session cookies (set a real secret in production)
+
+## CLI mode
+
+The same binary also runs one-off admin commands instead of starting the web
+server, when passed a flag:
+
+```bash
+go run ./cmd/server --version     # prints the version from version.txt
+go run ./cmd/server --setup       # interactively saves comtec-as400 connection details to ./as400.json
+go run ./cmd/server --send-log    # emails ./app.log as an attachment, using ./settings/smtp.json
+```
+
+- `--version` reads `version.txt` (repo root) and prints it.
+- `--setup` prompts for the comtec-as400 URL, username, and password, then
+  writes them to `./as400.json` (0600 permissions; git-ignored — never commit
+  real credentials). Password entry is masked when run in a real terminal.
+- `--send-log` reads SMTP settings from `./settings/smtp.json` (also
+  git-ignored) and emails the contents of `./app.log` as an attachment:
+  ```json
+  {
+    "host": "smtp.example.com",
+    "port": 587,
+    "username": "smtp-user",
+    "password": "smtp-password",
+    "from": "goapp@example.com",
+    "to": ["ops@example.com"]
+  }
+  ```
+  Leave `username`/`password` empty to send without SMTP authentication.
+- Running the server normally (no flags) also appends request logs to
+  `./app.log` (in addition to stdout), so there's always something for
+  `--send-log` to send.
 
 ## Running the tests
 

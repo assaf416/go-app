@@ -1,3 +1,6 @@
 /goapp.db
 /goapp
 *.db
+/app.log
+/as400.json
+/settings/smtp.json

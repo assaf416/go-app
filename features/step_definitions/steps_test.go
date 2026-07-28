@@ -28,6 +28,15 @@ type testState struct {
 	client   *http.Client
 	lastResp *http.Response
 	lastBody string
+
+	// CLI-scenario state (see cli_steps_test.go)
+	workDir     string
+	cliOut      string
+	cliRunErr   error
+	setupURL    string
+	setupUser   string
+	smtpCapture *smtpCapture
+	smtpStop    func()
 }
 
 func newTestState() *testState {
@@ -54,6 +63,12 @@ func (ts *testState) close() {
 	ts.server.Close()
 	ts.conn.Close()
 	os.Remove(ts.dbPath)
+	if ts.smtpStop != nil {
+		ts.smtpStop()
+	}
+	if ts.workDir != "" {
+		os.RemoveAll(ts.workDir)
+	}
 }
 
 func (ts *testState) userExists(name, email, password string) error {
@@ -202,6 +217,27 @@ func InitializeScenario(sc *godog.ScenarioContext) {
 
 	sc.Step(`^הוא מופנה למסך ההתחברות$`,
 		func() error { return ts.redirectedTo("/login") })
+
+	sc.Step(`^שקובץ version\.txt מכיל "([^"]+)"$`,
+		func(content string) error { return ts.versionFileContains(content) })
+
+	sc.Step(`^מריצים את "([^"]+)"$`, func(cmdline string) error { return ts.runCLICommand(cmdline) })
+
+	sc.Step(`^הפלט מכיל "([^"]+)"$`, func(text string) error { return ts.cliOutputContains(text) })
+
+	sc.Step(`^מריצים את "go-app --setup" ומזינים כתובת "([^"]+)", משתמש "([^"]+)" וסיסמה "([^"]+)"$`,
+		func(url, user, password string) error { return ts.runSetupCommand(url, user, password) })
+
+	sc.Step(`^קובץ as400\.json נוצר ומכיל את כתובת ה-URL ואת שם המשתמש$`,
+		func() error { return ts.as400FileCreated() })
+
+	sc.Step(`^שקיימות הגדרות SMTP תקינות בקובץ settings/smtp\.json$`,
+		func() error { return ts.smtpConfigured() })
+
+	sc.Step(`^קיים קובץ לוג עם תוכן$`, func() error { return ts.logFileWithContent() })
+
+	sc.Step(`^נשלח מייל עם קובץ הלוג כקובץ מצורף$`,
+		func() error { return ts.emailWithLogAttachmentSent() })
 }
 
 func TestMain(m *testing.M) {
